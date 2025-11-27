@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserState } from '../types';
 
 interface UserContextType extends UserState {
+  userId: string;
   consumeQuota: () => void;
   purchaseSingle: () => void;
   purchaseWeekly: () => void;
@@ -14,6 +15,7 @@ interface UserContextType extends UserState {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [userId, setUserId] = useState('');
   const [usageCount, setUsageCount] = useState(0);
   const [extraQuota, setExtraQuota] = useState(0);
   const [vipExpiry, setVipExpiry] = useState<number | null>(null);
@@ -21,6 +23,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load from local storage on mount
   useEffect(() => {
+    // User ID Logic
+    let storedUserId = localStorage.getItem('lingji_user_id');
+    if (!storedUserId) {
+      storedUserId = Math.random().toString(36).substr(2, 9).toUpperCase();
+      localStorage.setItem('lingji_user_id', storedUserId);
+    }
+    setUserId(storedUserId);
+
     const savedUsage = localStorage.getItem('lingji_usage');
     const savedExtra = localStorage.getItem('lingji_extra');
     const savedVip = localStorage.getItem('lingji_vip');
@@ -79,6 +89,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <UserContext.Provider value={{
+      userId,
       usageCount,
       maxFree,
       extraQuota,

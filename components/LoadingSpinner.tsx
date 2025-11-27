@@ -1,6 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const LoadingSpinner: React.FC<{ text?: string }> = ({ text = "正在推演..." }) => {
+const MESSAGES = [
+  "正在沟通宇宙能量...",
+  "推演星辰轨迹...",
+  "解析五行生克...",
+  "连接灵性磁场...",
+  "洞察命运玄机..."
+];
+
+const LoadingSpinner: React.FC<{ text?: string }> = ({ text }) => {
+  const [currentText, setCurrentText] = useState(text || MESSAGES[0]);
+
+  useEffect(() => {
+    if (text) return; // If explicit text provided, use it
+    
+    let index = 0;
+    const interval = setInterval(() => {
+      index = (index + 1) % MESSAGES.length;
+      setCurrentText(MESSAGES[index]);
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, [text]);
+
   return (
     <div className="flex flex-col items-center justify-center p-12 space-y-8 animate-fade-in">
       <div className="relative w-24 h-24">
@@ -22,9 +44,11 @@ const LoadingSpinner: React.FC<{ text?: string }> = ({ text = "正在推演..." 
         </div>
       </div>
       
-      <div className="text-center">
-        <p className="text-gold-200 font-serif text-xl tracking-widest">{text}</p>
-        <p className="text-gold-500/40 text-xs mt-2 uppercase tracking-[0.3em] animate-pulse">Computing Fate</p>
+      <div className="text-center h-12">
+        <p className="text-gold-200 font-serif text-xl tracking-widest animate-pulse transition-all duration-500">
+          {currentText}
+        </p>
+        <p className="text-gold-500/40 text-xs mt-2 uppercase tracking-[0.3em]">Computing Fate</p>
       </div>
     </div>
   );

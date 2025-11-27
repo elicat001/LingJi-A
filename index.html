@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>灵机 LingJi AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
@@ -16,45 +16,56 @@
             },
             colors: {
               mystic: {
-                950: '#0f0a14',
-                900: '#1a1025',
-                800: '#2d1b3e',
-                700: '#462a5e',
-                600: '#5e3a7d',
+                950: '#0a050e', // Darker base
+                900: '#140b1c',
+                800: '#231232',
+                700: '#3a2052',
+                600: '#532e75',
                 500: '#7a4b9b',
                 100: '#e6dff0',
               },
               gold: {
+                100: '#fef3c7',
                 200: '#fde68a',
                 300: '#fcd34d',
                 400: '#fbbf24',
                 500: '#f59e0b',
                 600: '#d97706',
                 700: '#b45309',
+                800: '#92400e',
+                900: '#78350f',
               }
             },
             backgroundImage: {
-              'cosmos': 'radial-gradient(circle at center top, #2d1b3e 0%, #1a1025 40%, #0f0a14 100%)',
+              'cosmos': 'radial-gradient(circle at 50% 0%, #2d1b3e 0%, #0a050e 70%)',
               'gold-gradient': 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)',
-              'glass': 'linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)',
+              'glass': 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)',
+              'glass-shine': 'linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.05) 25%, transparent 30%)',
             },
             animation: {
               'float': 'float 6s ease-in-out infinite',
-              'glow': 'glow 2s ease-in-out infinite alternate',
-              'fade-in': 'fadeIn 0.6s ease-out forwards',
+              'float-slow': 'float 10s ease-in-out infinite',
+              'glow': 'glow 3s ease-in-out infinite alternate',
+              'fade-in': 'fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'shimmer': 'shimmer 3s linear infinite',
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
               float: {
                 '0%, 100%': { transform: 'translateY(0)' },
-                '50%': { transform: 'translateY(-10px)' },
+                '50%': { transform: 'translateY(-15px)' },
               },
               glow: {
-                '0%': { boxShadow: '0 0 5px rgba(251, 191, 36, 0.2)' },
-                '100%': { boxShadow: '0 0 20px rgba(251, 191, 36, 0.6)' },
+                '0%': { boxShadow: '0 0 5px rgba(251, 191, 36, 0.1)' },
+                '100%': { boxShadow: '0 0 25px rgba(251, 191, 36, 0.4)' },
               },
               fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              shimmer: {
+                '0%': { backgroundPosition: '200% 0' },
+                '100%': { backgroundPosition: '-200% 0' }
               }
             }
           }
@@ -73,8 +84,49 @@
   }
 }
 </script>
+<style>
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #140b1c; 
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #3a2052; 
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #532e75; 
+  }
+  
+  /* Input autofill fix */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px #1a1025 inset !important;
+    -webkit-text-fill-color: #fde68a !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* 3D Transform Utilities */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+</style>
 </head>
-  <body class="bg-cosmos min-h-screen text-mystic-100 font-sans antialiased selection:bg-gold-500/30 selection:text-gold-200 overflow-x-hidden">
+  <body class="bg-mystic-950 min-h-screen text-mystic-100 font-sans antialiased selection:bg-gold-500/30 selection:text-gold-200 overflow-x-hidden">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
