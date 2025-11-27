@@ -1,0 +1,7 @@
+{
+  "name": "LingJi AI (灵机)",
+  "description": "An AI-powered metaphysics application featuring BaZi fortune telling, Palm/Face reading, Feng Shui analysis, and Tarot divination using Google Gemini.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
