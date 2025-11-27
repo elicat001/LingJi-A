@@ -3,7 +3,7 @@ import { UserProfile } from '../types';
 import { getBaZiAnalysis } from '../services/geminiService';
 import LoadingSpinner from './LoadingSpinner';
 import MarkdownResult from './MarkdownResult';
-import { Sparkles, User, Calendar, Clock, HelpCircle, ArrowRight } from 'lucide-react';
+import { Sparkles, User, Calendar, Clock, HelpCircle, ArrowRight, Compass } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 
 const InputField: React.FC<{
@@ -43,6 +43,7 @@ const BaZiFeature: React.FC = () => {
     birthDate: '',
     birthTime: '',
   });
+  const [targetDate, setTargetDate] = useState(new Date().toISOString().split('T')[0]);
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -61,7 +62,8 @@ const BaZiFeature: React.FC = () => {
         profile.gender,
         profile.birthDate,
         profile.birthTime,
-        query || "综合运势"
+        query || "综合运势",
+        targetDate
       );
       setResult(analysis);
       consumeQuota();
@@ -144,6 +146,28 @@ const BaZiFeature: React.FC = () => {
               value={profile.birthTime} 
               onChange={(e) => setProfile({...profile, birthTime: e.target.value})} 
             />
+          </div>
+
+          {/* New Section: Analysis Date Selection */}
+          <div className="mb-8 relative z-10 border-t border-white/5 pt-6">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InputField 
+                  label="测算日期 (默认今日)" 
+                  icon={Compass}
+                  type="date"
+                  value={targetDate} 
+                  onChange={(e) => setTargetDate(e.target.value)} 
+                  className="calendar-dark"
+                />
+                 <div className="group hidden md:block">
+                   <label className="block text-gold-400/60 text-[10px] font-bold uppercase tracking-[0.2em] mb-2 ml-1">
+                      说明
+                   </label>
+                   <div className="bg-mystic-800/30 border border-white/5 rounded-xl px-4 py-4 h-[58px] flex items-center text-xs text-gray-500">
+                     <p>选择不同日期可查看未来的流日运势</p>
+                   </div>
+                 </div>
+             </div>
           </div>
 
           <div className="mb-8 group relative z-10">

@@ -16,19 +16,20 @@ const cleanBase64 = (dataUrl: string) => {
 
 /**
  * Perform BaZi analysis based on user profile.
- * Enhanced to include Yearly, Monthly, and Daily fortunes.
+ * Enhanced to include Yearly, Monthly, and Daily fortunes with configurable target date.
  */
 export const getBaZiAnalysis = async (
   name: string,
   gender: string,
   birthDate: string,
   birthTime: string,
-  query: string
+  query: string,
+  targetDateStr?: string
 ): Promise<string> => {
   try {
-    const now = new Date();
+    const dateObj = targetDateStr ? new Date(targetDateStr) : new Date();
     // Format: 2023年10月27日 星期五
-    const currentDateStr = now.toLocaleDateString('zh-CN', { 
+    const analysisDateStr = dateObj.toLocaleDateString('zh-CN', { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric', 
@@ -36,41 +37,55 @@ export const getBaZiAnalysis = async (
     });
 
     const prompt = `
-    Role: You are "LingJi Zi" (灵机子), a master of BaZi (Four Pillars of Destiny).
+    Role: You are "LingJi Zi" (灵机子), a profound master of BaZi (Four Pillars of Destiny) and I Ching.
 
     User Profile:
     - Name: ${name}
     - Gender: ${gender}
     - Gregorian Birth Date: ${birthDate}
     - Birth Time: ${birthTime}
-    - **Analysis Target Date (Current Date)**: ${currentDateStr}
+    - **Analysis Target Date**: ${analysisDateStr}
 
-    Task: Perform a comprehensive life and current fortune analysis.
+    Task: Perform a deep, comprehensive fortune analysis focusing on the specific energies of the Year, Month, and Day relative to the user's Natal Chart.
 
-    1. **Chart Calculation (排盘)**: 
-       - Calculate the User's Four Pillars (Year, Month, Day, Hour) based on Birth Date/Time.
-       - Identify the **Current** Time Pillars (Year, Month, Day) for ${currentDateStr}.
-    
-    2. **Core Destiny Analysis (命局简析)**:
-       - Identify the Day Master (日主) and its strength (旺衰).
-       - Identify the Useful God (喜用神) and Taboo (忌神).
-       - Briefly describe the personality and core potential.
+    Structure & Content Requirements (Strict Markdown Format):
 
-    3. **Time-Based Fortune Analysis (流运推演)**:
-       - **Yearly Fortune (流年运势)**: Analyze the interaction between the current year's pillar and the user's natal chart. Focus on career, wealth, and health for this year.
-       - **Monthly Fortune (流月运势)**: Specific guidance for the current month. What energies are dominant?
-       - **Daily Fortune (今日运势)**: Specific guidance for today (${currentDateStr}). What activity is auspicious? What should be avoided?
+    1.  **🏷️ 命盘与时空 (Destiny & Space-Time)**
+        *   **Natal Chart (本命)**: Display the user's Four Pillars (Year, Month, Day, Hour).
+        *   **Current Time (流年流月流日)**: Convert ${analysisDateStr} to the **Lunar Date** and display the **Current Pillars** (Year, Month, Day).
+        *   **Day Master Status**: Identify the Day Master element (e.g., Yang Fire) and its strength in the current season.
 
-    4. **User Query Response (答疑)**:
-       - Address the user's specific question: "${query || 'General Fortune'}"
+    2.  **📅 流年与流月 (Yearly & Monthly Energies)**
+        *   **Yearly Luck**: Interaction between Natal Chart and current Year Pillar (Tai Sui).
+        *   **Monthly Focus**: Key theme for this month (Wealth, Career, Relationships, or Health).
+        *   **Advice**: One sentence summary of the general trend.
 
-    5. **Actionable Advice (开运建议)**:
-       - Provide 1-2 concrete actions (lucky color, direction, accessory, or behavior) suitable for the current period.
+    3.  **☀️ 今日运势 (Daily Fortune for ${analysisDateStr})**
+        *   **Fortune Score**: [0-100]
+        *   **Energy Reading**: Describe the mood (e.g., "Heavenly Stem Combine", "Earthly Branch Clash").
+        *   **Gods & Killings (神煞)**: List active stars today (e.g., Nobleman, Peach Blossom, Traveling Horse).
+        *   **Lucky Hours (吉时)**: List the two best 2-hour periods today.
+        *   **Direction**: Wealth God (财神) & Joy God (喜神) directions.
 
-    Format:
-    - Use Markdown.
-    - Use clear headings like "### 📅 今日运势".
-    - Tone: Professional, authoritative, warm, yet grounded.
+    4.  **✅ 每日宜忌 (Yi & Ji)**
+        *   **宜 (Do)**:
+            *   [Activity 1]
+            *   [Activity 2]
+            *   [Activity 3]
+        *   **忌 (Don't)**:
+            *   [Activity 1]
+            *   [Activity 2]
+            *   [Activity 3]
+
+    5.  **💡 答疑解惑 (Q&A)**
+        *   Address the user's specific query with depth: "${query || 'Please provide general guidance for my current path.'}"
+
+    6.  **🔮 开运锦囊 (Remedies)**
+        *   **Lucky Color**: [Color]
+        *   **Lucky Number**: [Number]
+        *   **Action**: A specific behavioral or Feng Shui tip for today.
+
+    Tone: Mystical, authoritative, empathetic, and culturally rich. Use professional BaZi terminology (e.g., "Seven Killings", "Direct Wealth") but explain them simply.
     `;
 
     const response = await ai.models.generateContent({
@@ -78,7 +93,7 @@ export const getBaZiAnalysis = async (
       contents: prompt,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION_BASE,
-        temperature: 0.7,
+        temperature: 0.75,
       },
     });
 

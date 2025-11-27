@@ -25,7 +25,7 @@ const TarotFeature: React.FC = () => {
     
     setTimeout(() => {
       drawCards();
-    }, 2500);
+    }, 3000); // Extended slightly for the animation to be enjoyed
   };
 
   const drawCards = () => {
@@ -104,7 +104,7 @@ const TarotFeature: React.FC = () => {
       </div>
 
       {step === 'input' && (
-        <div className="bg-glass backdrop-blur-xl border border-white/5 p-8 md:p-12 rounded-3xl shadow-2xl max-w-xl mx-auto animate-fade-in relative overflow-hidden">
+        <div key="input" className="bg-glass backdrop-blur-xl border border-white/5 p-8 md:p-12 rounded-3xl shadow-2xl max-w-xl mx-auto animate-fade-in relative overflow-hidden">
           {/* Decorative Rings */}
           <div className="absolute -top-20 -left-20 w-40 h-40 border border-white/5 rounded-full"></div>
           <div className="absolute -bottom-20 -right-20 w-60 h-60 border border-white/5 rounded-full"></div>
@@ -136,24 +136,39 @@ const TarotFeature: React.FC = () => {
       )}
 
       {step === 'shuffling' && (
-        <div className="py-24 relative flex justify-center">
+        <div key="shuffling" className="py-24 relative flex justify-center animate-fade-in">
            <div className="relative w-40 h-64">
              {[1, 2, 3, 4, 5].map((i) => (
                <div 
                   key={i} 
-                  className="absolute inset-0 rounded-xl shadow-2xl border-2 border-gold-500/20"
+                  className="absolute inset-0"
                   style={{ 
-                    ...cardBackStyle,
+                    // Use CSS Animation for float to avoid conflict with transform
                     animation: `float ${3 + i * 0.5}s ease-in-out infinite`,
-                    transform: `translateX(${(i-3)*10}px) rotate(${(i-3)*5}deg)`,
                     zIndex: 10 - i
                   }}
                >
-                 <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-gold-500/10 to-transparent"></div>
-                    <div className="w-20 h-20 rounded-full border border-gold-500/10 flex items-center justify-center">
-                       <Moon className="w-8 h-8 text-gold-500/30" />
-                    </div>
+                 <div 
+                    className="w-full h-full rounded-xl shadow-2xl border-2 border-gold-500/20 overflow-hidden"
+                    style={{ 
+                      ...cardBackStyle,
+                      transform: `translateX(${(i-3)*10}px) rotate(${(i-3)*5}deg)`,
+                    }}
+                 >
+                   {/* Shimmer Overlay on Back */}
+                   <div className="absolute inset-0 z-10 pointer-events-none">
+                      <div 
+                        className="w-[200%] h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 animate-shimmer"
+                        style={{ backgroundSize: '50% 100%' }} 
+                      ></div>
+                   </div>
+
+                   <div className="w-full h-full flex items-center justify-center relative z-0">
+                      <div className="absolute inset-0 bg-gradient-to-br from-gold-500/10 to-transparent"></div>
+                      <div className="w-20 h-20 rounded-full border border-gold-500/10 flex items-center justify-center">
+                         <Moon className="w-8 h-8 text-gold-500/30" />
+                      </div>
+                   </div>
                  </div>
                </div>
              ))}
@@ -165,7 +180,7 @@ const TarotFeature: React.FC = () => {
       )}
 
       {(step === 'drawn' || step === 'interpreting' || step === 'result') && (
-        <div className="space-y-12 animate-fade-in pb-20">
+        <div key="drawn" className="space-y-12 animate-fade-in pb-20">
           
           {/* Instruction Text */}
           {step === 'drawn' && !allRevealed && (
@@ -182,22 +197,37 @@ const TarotFeature: React.FC = () => {
                 {/* 3D Card Container */}
                 <div 
                   onClick={() => revealCard(idx)}
-                  className={`relative w-56 h-96 cursor-pointer transform-style-3d transition-transform duration-1000 ${revealed[idx] ? 'rotate-y-180' : ''}`}
+                  className={`relative w-56 h-96 cursor-pointer transform-style-3d transition-all duration-1000 ${
+                    revealed[idx] 
+                      ? 'rotate-y-180' 
+                      : 'hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(251,191,36,0.1)]' // Hover effect for unrevealed
+                  }`}
                 >
                    {/* Front of Card (Face Down / Back Pattern) */}
                    <div 
-                      className="absolute inset-0 w-full h-full rounded-2xl backface-hidden shadow-2xl border-2 border-gold-500/30"
+                      className="absolute inset-0 w-full h-full rounded-2xl backface-hidden shadow-2xl border-2 border-gold-500/30 transition-colors duration-500"
                       style={cardBackStyle}
                    >
+                     {/* Hover glow on back */}
+                     <div className="absolute inset-0 bg-gold-500/0 group-hover:bg-gold-500/10 transition-colors duration-500 rounded-2xl"></div>
+                     
                      <div className="w-full h-full flex items-center justify-center">
-                       <Moon className="w-12 h-12 text-gold-500/30" />
+                       <Moon className="w-12 h-12 text-gold-500/30 group-hover:text-gold-500/50 transition-colors" />
                      </div>
                    </div>
 
                    {/* Back of Card (Face Up / Content) */}
                    <div 
-                      className={`absolute inset-0 w-full h-full rounded-2xl backface-hidden bg-[#0f0a14] border-2 border-gold-500/30 shadow-[0_0_30px_rgba(126,34,206,0.2)] rotate-y-180 overflow-hidden`}
+                      className={`absolute inset-0 w-full h-full rounded-2xl backface-hidden bg-[#0f0a14] border-2 shadow-[0_0_30px_rgba(126,34,206,0.2)] rotate-y-180 overflow-hidden ${
+                          revealed[idx] ? 'border-gold-500/50 shadow-[0_0_25px_rgba(251,191,36,0.25)]' : 'border-gold-500/30'
+                      }`}
                    >
+                       {/* Pulse/Glow Effect for Revealed Cards */}
+                       <div className="absolute inset-0 bg-gold-500/5 animate-pulse-slow pointer-events-none"></div>
+
+                       {/* Flash Effect on Reveal */}
+                       <div className={`absolute inset-0 bg-white z-50 pointer-events-none transition-opacity duration-[2000ms] ${revealed[idx] ? 'opacity-0' : 'opacity-30'}`}></div>
+
                        {/* Card Content Container - Rotates if Reversed */}
                        <div className={`w-full h-full flex flex-col items-center justify-between p-5 bg-gradient-to-br from-white/5 to-transparent relative z-10 ${drawnCards[idx].isReversed ? 'rotate-180' : ''}`}>
                           
@@ -257,7 +287,7 @@ const TarotFeature: React.FC = () => {
           {step === 'interpreting' && <LoadingSpinner />}
 
           {step === 'result' && result && (
-            <div className="text-left mt-16 bg-glass backdrop-blur-2xl p-8 md:p-12 rounded-3xl border border-white/5 animate-fade-in shadow-2xl relative">
+            <div key="result" className="text-left mt-16 bg-glass backdrop-blur-2xl p-8 md:p-12 rounded-3xl border border-white/5 animate-fade-in shadow-2xl relative">
                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
                <div className="flex justify-between items-center mb-10 border-b border-white/5 pb-6">
                  <h3 className="text-3xl text-gold-200 font-serif font-bold flex items-center">
